@@ -12,6 +12,9 @@ unless noted in the file themselves. See the LICENSE.md file for more informatio
 
 ### Here is the example map:
 
+ - [Computational Fluid Dynamics](https://github.com/sylabs/examples/tree/master/computational-fluid-dynamics)
+   - [OpenFOAM](https://github.com/sylabs/examples/tree/master/computational-fluid-dynamics/openfoam)
+
  - [Database](https://github.com/sylabs/examples/tree/master/database)
    - [MariaDB](https://github.com/sylabs/examples/tree/master/database/mariadb)
    - [MongoDB](https://github.com/sylabs/examples/tree/master/database/mongodb)
@@ -46,6 +49,9 @@ unless noted in the file themselves. See the LICENSE.md file for more informatio
    - [Orange Data Mining](https://github.com/sylabs/examples/tree/master/machinelearning/orange)
    - [Spark](https://github.com/sylabs/examples/tree/master/machinelearning/spark)
    - [Weka](https://github.com/sylabs/examples/tree/master/machinelearning/weka)
+
+ - [Visualization](https://github.com/sylabs/examples/tree/master/visualization)
+   - [ParaView](https://github.com/sylabs/examples/tree/master/visualization/paraview)
 
 <br>
 <br>

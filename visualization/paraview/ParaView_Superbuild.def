@@ -1,0 +1,78 @@
+BootStrap: library
+From: ubuntu:16.04
+
+%post
+    apt-get update
+    apt-get install -y build-essential flex bison git-core cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev
+    apt-get install -y qt4-dev-tools libqt4-dev libqt4-opengl-dev freeglut3-dev libqtwebkit-dev curl gcc git flex wget
+    apt-get install -y software-properties-common apt-transport-https curl openssl libssl-dev
+    export QT_SELECT=qt4
+
+# Install later version cmake
+    wget https://cmake.org/files/v3.13/cmake-3.13.0-rc2.tar.gz
+    tar -xvf cmake-3.13.0-rc2.tar.gz
+    cd cmake-3.13.0-rc2/
+    ./configure
+    make
+    make install
+    cd /
+    cmake --version
+
+# Install ParaView
+    git clone --recursive https://gitlab.kitware.com/paraview/paraview-superbuild.git
+    cd paraview-superbuild
+    git fetch origin
+    git checkout v5.6.0
+    git submodule init
+    git submodule update
+
+    mkdir /ParaView-5.6.0_Linux-x86_64
+    cd /ParaView-5.6.0_Linux-x86_64/
+
+    /usr/local/bin/cmake /paraview-superbuild/ -DENABLE_boost=on -DENABLE__diy=ON -DENABLE_freetype=ON -DENABLE_hdf5=ON -DENABLE_libxml2=ON -DENABLE_matplotlib=ON -DENABLE_numpy=ON -DENABLE_paraview=ON -DENABLE_png=ON -DENABLE_python=ON -DENABLE_qhull=ON -DENABLE_qt=ON -DENABLE_szip=ON -DENABLE_zlib=ON
+    make
+    make install
+
+# Install Open MPI
+    cd /
+    mkdir -p openmpi && \
+    cd openmpi && \
+    wget https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.gz && \
+    tar zxf openmpi-3.1.2.tar.gz && \
+    cd openmpi-3.1.2 && \
+    ./configure --enable-orterun-prefix-by-default && \
+    make -j $(nproc) all && \
+    make install && \
+    ldconfig && \
+    rm -rf openmpi
+
+# Install OpenFOAM-6
+    cd /
+    pwd
+
+    sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
+    add-apt-repository http://dl.openfoam.org/ubuntu
+    apt-get update
+    apt-get -y install openfoam6
+
+# setup to use bash (for OpenFOAM)
+    /bin/rm /bin/sh
+    /bin/ln -s /bin/bash /bin/sh
+    echo '. /opt/openfoam6/etc/bashrc' >>$SINGULARITY_ENVIRONMENT
+
+%runscript
+    . /opt/openfoam6/etc/bashrc
+    mkdir -p $FOAM_RUN
+    cd $FOAM_RUN
+    cp -r $FOAM_TUTORIALS/incompressible/simpleFoam/pitzDaily .
+    cd pitzDaily
+
+# If do not we have something passed in, run some examples ... otherwise assume we are calling simpleFoam, etc. directly
+    if [ -z "$1" ]; then
+        blockMesh
+        simpleFoam
+    else
+        ${@}
+    fi
+
+
